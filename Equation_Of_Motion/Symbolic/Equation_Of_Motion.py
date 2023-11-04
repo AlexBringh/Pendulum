@@ -144,6 +144,10 @@ def B (theta, phi) -> np.array:
         [                                           0,                          0])
 
 
+def B_T (theta, phi) -> np.array:
+    return np.transpose(B(theta, phi))
+
+
 #B-dot-matrix
 def B_dot (theta, theta_dot, phi, phi_dot) -> np.array:
     return np.array(
@@ -167,3 +171,40 @@ def B_dot (theta, theta_dot, phi, phi_dot) -> np.array:
         [                                                                             0,                                               0])
 
 
+def M_star (theta, phi) -> np.array:
+    """
+        M* = B_T * M * B
+    """
+    return np.dot( np.dot( B_T(theta, phi), M ), B(theta, phi))
+
+
+def M_star_inv (theta, phi) -> np.array:
+    return np.linalg.inv(M_star(theta, phi))
+
+
+def N_star (theta, theta_dot, phi, phi_dot) -> np.array:
+    """
+        N* = B_T * M * B_dot + B_T * D * M * B
+    """
+    return np.add( np.dot( np.dot( B_T(theta, phi), M ), B_dot(theta, theta_dot, phi, phi_dot) ), np.dot( np.dot( np.dot( B_T(theta, phi), D(theta_dot, phi_dot) ), M ), B(theta, phi) ) )
+
+
+def F_star (theta, phi) -> np.array:
+    """
+        F* = B_T * F
+    """
+    return np.dot( B_T(theta, phi), F )
+
+
+def Q (theta_dot, phi_dot):
+    return np.array(
+        [theta_dot],
+        [phi_dot])
+
+
+def solve_Q_dot (theta, theta_dot, phi, phi_dot) -> np.array:
+    """
+        Equation of motion solving for Q_dot.
+        Q_dot = inv(M*) * (F* - N* * Q)
+    """
+    return np.subtract( np.dot( M_star_inv(theta, phi), F_star(theta, phi) ), np.dot( N_star(theta, theta_dot, phi, phi_dot), Q(theta_dot, phi_dot) ) )
