@@ -1,22 +1,22 @@
 import numpy as np
-
+import matplotlib.pyplot as plt
 """
     Defining static variables and matrices.
 """
 
 # Lengths on the pendulum
-l1 = 0
-l2 = 0
-l3 = 0
-l4 = 0
-l5 = 0
-l6 = 0
-l7 = 0
+l1 = 15
+l2 = 1
+l3 = 2
+l4 = 2
+l5 = 1
+l6 = 2
+l7 = 3
 
 # Radius of each body (since we assume the arms are cylinders and the end is a sphere)
-r1 = 0
-r2 = 0
-r3 = 0
+r1 = 1
+r2 = 1
+r3 = 2
 
 # Mass of each body
 m1 = 1
@@ -37,8 +37,14 @@ J31 = 0
 J32 = 0
 J33 = 0
 
+# Tidsvariabler
+time = 0
+time_end = 100
+dt = 0.1
+steps = int((time_end - time) / dt)
+
 # M-matrix
-M = np.array(
+M = np.array([
     [J11, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], 
     [0, J12, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], 
     [0, 0, J13, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], 
@@ -56,10 +62,10 @@ M = np.array(
     [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, J33, 0, 0, 0], 
     [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,  m3, 0, 0], 
     [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,  m3, 0], 
-    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,  m3])
+    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,  m3]])
 
 # F-matrix
-F = np.array(
+F = np.array([
     [    0],
     [    0],
     [-m1*g],
@@ -77,7 +83,7 @@ F = np.array(
     [-m3*g],
     [    0],
     [    0],
-    [    0])
+    [    0]])
 
 
 """
@@ -85,8 +91,8 @@ F = np.array(
 """
 
 # Angles
-theta = 0
-phi = 0
+theta = np.pi
+phi = np.pi
 
 # Angular velocity
 theta_dot = 0
@@ -100,7 +106,7 @@ phi_dot_dot = 0
 def D (theta_dot, phi_dot) -> np.array:
     td = theta_dot
     pd = phi_dot
-    return np.array(
+    return np.array([
         [0,  0,   0, 0, 0, 0, 0,       0,        0, 0, 0, 0, 0,       0,        0, 0, 0, 0], 
         [0,  0, -td, 0, 0, 0, 0,       0,        0, 0, 0, 0, 0,       0,        0, 0, 0, 0], 
         [0, td,   0, 0, 0, 0, 0,       0,        0, 0, 0, 0, 0,       0,        0, 0, 0, 0], 
@@ -118,12 +124,12 @@ def D (theta_dot, phi_dot) -> np.array:
         [0,  0,   0, 0, 0, 0, 0,       0,        0, 0, 0, 0, 0, (td+pd),        0, 0, 0, 0], 
         [0,  0,   0, 0, 0, 0, 0,       0,        0, 0, 0, 0, 0,       0,        0, 0, 0, 0], 
         [0,  0,   0, 0, 0, 0, 0,       0,        0, 0, 0, 0, 0,       0,        0, 0, 0, 0], 
-        [0,  0,   0, 0, 0, 0, 0,       0,        0, 0, 0, 0, 0,       0,        0, 0, 0, 0])
+        [0,  0,   0, 0, 0, 0, 0,       0,        0, 0, 0, 0, 0,       0,        0, 0, 0, 0]])
 
 
 # B-matrix
 def B (theta, phi) -> np.array:
-    return np.array(
+    return np.array([
         [                                           0,                          0],
         [                           -l3*np.sin(theta),                          0],
         [                            l3*np.cos(theta),                          0],
@@ -141,7 +147,7 @@ def B (theta, phi) -> np.array:
         [ (l3+l4)*np.cos(-theta)+l7*np.cos(theta+phi),  (l6+l7)*np.cos(theta+phi)],
         [                                           1,                          1],
         [                                           0,                          0],
-        [                                           0,                          0])
+        [                                           0,                          0]])
 
 
 def B_T (theta, phi) -> np.array:
@@ -150,7 +156,7 @@ def B_T (theta, phi) -> np.array:
 
 #B-dot-matrix
 def B_dot (theta, theta_dot, phi, phi_dot) -> np.array:
-    return np.array(
+    return np.array([
         [                                                                             0,                                               0],
         [                                                   -l3*theta_dot*np.cos(theta),                                               0],
         [                                                   -l3*theta_dot*np.sin(theta),                                               0],
@@ -168,7 +174,7 @@ def B_dot (theta, theta_dot, phi, phi_dot) -> np.array:
         [ -(l3+l4)*(-theta_dot)*np.sin(-theta)-l7*(theta_dot+phi_dot)*np.sin(theta+phi),  -(l6+l7)*(theta_dot+phi_dot)*np.sin(theta+phi)],
         [                                                                             0,                                               0],
         [                                                                             0,                                               0],
-        [                                                                             0,                                               0])
+        [                                                                             0,                                               0]])
 
 
 def M_star (theta, phi) -> np.array:
@@ -197,9 +203,9 @@ def F_star (theta, phi) -> np.array:
 
 
 def Q (theta_dot, phi_dot):
-    return np.array(
+    return np.array([
         [theta_dot],
-        [phi_dot])
+        [phi_dot]])
 
 
 def solve_Q_dot (theta, theta_dot, phi, phi_dot) -> np.array:
@@ -213,3 +219,21 @@ def solve_Q_dot (theta, theta_dot, phi, phi_dot) -> np.array:
 def integrate_Q_dot (data) -> np.array:
     return solve_Q_dot(theta=data[0], theta_dot=data[1], phi=data[2], phi_dot=[3])
 
+
+def calculate_derivatives(Q, theta, theta_dot, phi, phi_dot):
+    M_star_inv_matrix = M_star_inv(theta, phi)
+    N_star_matrix = N_star(theta, theta_dot, phi, phi_dot)
+    F_star_matrix = F_star(theta, phi)
+    Q_dot = np.dot(M_star_inv_matrix, (F_star_matrix - np.dot(N_star_matrix, Q)))
+    return Q_dot
+
+# Runge-kutta
+def runge_kutta(Q, theta, theta_dot, phi, phi_dot, dt):
+    k1 = calculate_derivatives(Q, theta, theta_dot, phi, phi_dot)
+    k2 = calculate_derivatives(Q + k1 * (dt / 2), theta, theta_dot, phi, phi_dot)
+    k3 = calculate_derivatives(Q + k2 * (dt / 2), theta, theta_dot, phi, phi_dot)
+    k4 = calculate_derivatives(Q + k3 * dt, theta, theta_dot, phi, phi_dot)
+
+    Q_next = Q + (dt / 6) * (k1 + 2 * k2 + 2 * k3 + k4)
+
+    return Q_next
