@@ -208,3 +208,8 @@ def solve_Q_dot (theta, theta_dot, phi, phi_dot) -> np.array:
         Q_dot = inv(M*) * (F* - N* * Q)
     """
     return np.subtract( np.dot( M_star_inv(theta, phi), F_star(theta, phi) ), np.dot( N_star(theta, theta_dot, phi, phi_dot), Q(theta_dot, phi_dot) ) )
+
+
+def integrate_Q_dot (data):
+    return solve_Q_dot(theta=data[0], theta_dot=data[1], phi=data[2], phi_dot=[3])
+
