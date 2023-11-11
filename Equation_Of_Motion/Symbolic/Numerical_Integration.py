@@ -49,7 +49,7 @@ def runge_kutta (time_end, time_start:float = 0, timestep:float = 0.1, theta_sta
         eom.phi = eom.phi + eom.phi_dot * dt
 
         # Update time
-        eom.time = eom.time + dt
+        eom.time = round(eom.time + dt, dro)
 
         # Save current values.
         store_time.append(eom.time)

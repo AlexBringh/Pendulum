@@ -8,7 +8,19 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <section id="control_panel"></section>
+    <section id="datapoints_selection_panel">
+        Select datapoints to animate.
+        <select name="datapoints" id="datapoints_dropdown">
+            <option value="no_air_res_th0:0_ph0:0_td:">No air resistance, theta0:0 , phi0:0 , dt:0.01 , time:100</option>
+            <option value="">Air resistance, theta0: , phi0: , dt: </option>
+        </select>
+    </section>
+    <section id="control_panel">
+        <input type="button" value="Start" id="start_animation_btn">
+        <input type="button" value="Pause" id="pause_animation_btn" disabled="disabled">
+        <input type="button" value="Stop" id="stop_animation_btn" disabled="disabled">
+        <input type="button" value="Reset Camera" id="reset_camera_btn">
+    </section>
     <section id="animation_container"></section>
     <section id="graphs"></section>
 </body>

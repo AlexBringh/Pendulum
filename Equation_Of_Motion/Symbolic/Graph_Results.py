@@ -23,11 +23,11 @@ def make_graph (filepath: str):
     
 
 # Plot the test cases (Comment these out when not testing!)
-#make_graph("results/RK4_man_NoAirResist, time02,41,31 date11,11,2023.csv")
-#make_graph("results/RK4_man_NoAirResist, time02,41,37 date11,11,2023.csv")
-#make_graph("results/RK4_man_NoAirResist, time02,41,48 date11,11,2023.csv")
-#make_graph("results/RK4_man_NoAirResist, time02,41,59 date11,11,2023.csv")
-#make_graph("results/RK4_man_NoAirResist, time02,42,05 date11,11,2023.csv")
+make_graph("results/RK4_man_NoAirResist, time00,40,09 date12,11,2023.csv")
+make_graph("results/RK4_man_NoAirResist, time00,40,15 date12,11,2023.csv")
+make_graph("results/RK4_man_NoAirResist, time00,40,26 date12,11,2023.csv")
+make_graph("results/RK4_man_NoAirResist, time00,40,38 date12,11,2023.csv")
+make_graph("results/RK4_man_NoAirResist, time00,40,43 date12,11,2023.csv")
 
 """
 # COMMENT / UNCOMMENT THE BELOW LINE DEPENDING ON IF YOU WANT TO SHOW THE GRAPH WHEN RUNNING THE PROGRAM. #
