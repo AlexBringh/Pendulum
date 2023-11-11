@@ -5,43 +5,43 @@ import numpy as np
 """
 
 # Lengths on the pendulum
-l1 = 15
-l2 = 1
-l3 = 2
-l4 = 2
-l5 = 1
-l6 = 2
-l7 = 3
+# Unit: [m]
+l1 = 1
+l2 = 0.05
+l3 = 0.1
+l4 = 0.1
+l5 = 0.05
+l6 = 0.1
+l7 = 0.2
 
 # Radius of each body (since we assume the arms are cylinders and the end is a sphere)
-r1 = 1
-r2 = 1
-r3 = 2
+# Unit: [m]
+r1 = 0.03
+r2 = 0.03
+r3 = 0.1
 
 # Mass of each body
-m1 = 1
-m2 = 1
-m3 = 3
+# Unit [kg]
+m1 = 0.001
+m2 = 0.001
+m3 = 0.001
 
 # Gravitational acceleration
+# Unit: [m/s^2]
 g = 9.81
 
 # Mass moments of inertia of each body, i about each axis, j. Jij
-J11 = 0
-J12 = 0
-J13 = 0
-J21 = 0
-J22 = 0
-J23 = 0
-J31 = 0
-J32 = 0
-J33 = 0
-
-# Tidsvariabler
-time = 0
-time_end = 100
-dt = 0.1
-steps = int((time_end - time) / dt)
+# Formulas taken from wikipedia page about mass moments of inertia og common shapes.
+# Unit: [kg/m^2]
+J11 = 1/12 * m1 * (3*r1**2 + (l3 + l4)**2)
+J12 = 1/2 * m1 * r1**2
+J13 = J11
+J21 = 1/12 * m2 * (3*r2**2 + (l6 + l7-r3)**2)
+J22 = 1/2 * m2 * r2**2
+J23 = J21
+J31 = 2/3 * m3 * r3**2
+J32 = J31
+J33 = J31
 
 # M-matrix
 M = np.array([
@@ -65,6 +65,7 @@ M = np.array([
     [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,  m3]])
 
 # F-matrix
+# Unit forces: [N], Unit moments: [Nm]
 F = np.array([
     [    0],
     [    0],
@@ -90,20 +91,16 @@ F = np.array([
     Defining time-dependant variables and matrices
 """
 
-# Time
+# Time [s]
 time: float
 
-# Angles
+# Angles [rad]
 theta: float
 phi: float
 
-# Angular velocity
+# Angular velocity [rad/s]
 theta_dot: float
 phi_dot: float
-
-# Angular acceleration
-theta_dot_dot: float
-phi_dot_dot: float
 
 # D-matrix
 def D (theta_dot, phi_dot) -> np.array:
@@ -132,7 +129,7 @@ def D (theta_dot, phi_dot) -> np.array:
 
 # B-matrix
 def B (theta, phi) -> np.array:
-    return np.array([
+    B_matrix = np.array([
         [                                           0,                          0],
         [                           -l3*np.sin(theta),                          0],
         [                            l3*np.cos(theta),                          0],
@@ -151,6 +148,8 @@ def B (theta, phi) -> np.array:
         [                                           1,                          1],
         [                                           0,                          0],
         [                                           0,                          0]])
+    #print(B_matrix, end="\n\n")
+    return B_matrix
 
 
 def B_T (theta, phi) -> np.array:
