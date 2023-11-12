@@ -5,6 +5,7 @@ from datetime import datetime
 from time import sleep
 
 import Equation_Of_Motion as eom
+import Graph_Results as graph
 
 
 def runge_kutta (time_end, time_start:float = 0, timestep:float = 0.1, theta_start:float = 0, theta_dot_start:float = 0.0, phi_start:float = 0, phi_dot_start:float = 0, decimal_roundoff: int = 10) -> pd.DataFrame:
@@ -83,24 +84,26 @@ def save_results (results:pd.DataFrame, title:str):
     try: 
         results.to_csv(f"results/{title}, time{current_datetime.strftime('%H,%M,%S')} date{current_datetime.strftime('%d,%m,%Y')}.csv")
         print(f"Succesfully wrote results to file: {title}, time{current_datetime.strftime('%H,%M,%S')} date{current_datetime.strftime('%d,%m,%Y')}.csv!")
+        graph.make_graph(f"results/{title}, time{current_datetime.strftime('%H,%M,%S')} date{current_datetime.strftime('%d,%m,%Y')}.csv")
+
     except:
         print(f"Error. Failed to write results to file: {title}, time{current_datetime.strftime('%H,%M,%S')} date{current_datetime.strftime('%d,%m,%Y')}.csv!")
     sleep(5) # Just a delay so that the files won't overwrite each other in case there are more than just 1.
     
 
 # The arms of the pendulum face straight down with these initial conditions. Should be NO development in movement. (apart from roundoff errors for floating point numbers) This one has a large timestep because the integration is simple.
-test_case1 = runge_kutta(time_end=5, timestep=0.1, theta_start=-np.pi / 2, phi_start=0)
+#test_case1 = runge_kutta(time_end=5, timestep=0.1, theta_start=-np.pi / 2, phi_start=0)
 
 # The arms face straight out and drop down immediately after start. Larger timestep and longer duration. (The base position for theta and phi points straight out so no change is necessary.)
-test_case2 = runge_kutta(time_end=10, timestep=0.01)
+#test_case2 = runge_kutta(time_end=10, timestep=0.01)
 
 # A test where the timestep is much smaller. Same initial conditions and time target as the previous test case.
-test_case3 = runge_kutta(time_end=10, timestep=0.001)
+#test_case3 = runge_kutta(time_end=10, timestep=0.001)
 
 # Test for a  lang target time, for a moderately large timestep. Again standard initial conditions.
 test_case4 = runge_kutta(time_end=100, timestep=0.01)
 
 # The last test case drops from the arms pointing 30 degrees upwards (theta = 1/6 * pi).
-test_case5 = runge_kutta(time_end=20, timestep=0.1, theta_start=1/6*np.pi)
+#test_case5 = runge_kutta(time_end=20, timestep=0.1, theta_start=1/6*np.pi)
 
 print("Numerical integration has finished.")

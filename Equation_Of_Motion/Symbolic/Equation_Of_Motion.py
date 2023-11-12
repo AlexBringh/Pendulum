@@ -22,9 +22,9 @@ r3 = 0.1
 
 # Mass of each body
 # Unit [kg]
-m1 = 0.001
-m2 = 0.001
-m3 = 0.001
+m1 = 0.02
+m2 = 0.02
+m3 = 0.03
 
 # Gravitational acceleration
 # Unit: [m/s^2]

@@ -4,9 +4,61 @@ import { OBJLoader } from 'three/addons/loaders/OBJLoader.js';
 import { MTLLoader } from 'three/addons/loaders/MTLLoader.js';
 import WebGL from 'three/addons/capabilities/WebGL.js';
 
+// Variable to mark busy with importing new data so the animation can't start before the data is ready.
+let isBusyImportingData = true;
+
+// Datapoint arrays for the animation.
+const time = []; // This is by default always empty because the animation doesn't actually need it.
+const theta = [];
+const phi = [];
+const theta_dot = []; // This is by default always empty because the animation doesn't actually need it.
+const phi_dot = [];   // This is by default always empty because the animation doesn't actually need it.
+let timestep;
+
+// Variable to keep track of where in the array we are for the animation.
+let counter = 0;
 
 // Import data from files
+async function get_data(filename)
+{
+    // Mark as busy importing data.
+    isBusyImportingData = true;
 
+    // Just making sure that the counter variable is set back to 0.
+    counter = 0;
+
+    // Clear out the previous data from the arrays.
+    time.length = 0;
+    theta.length = 0;
+    phi.length = 0;
+    theta_dot.length = 0; 
+    phi_dot.length = 0;
+
+    // Import datapoints from the .csv file as text. In javascript, we have to treat it as pure text and parse it manually.
+    const response = await fetch('data/' + filename);
+    const data = await response.text();
+
+    // Split into array where \n (newline) marks end of entry in array. Slice removes the first row, the title row.
+    const rows = data.split('\n').slice(1);
+    
+    //console.log(rows);
+    // Loop through the rows.
+    rows.forEach(row_element => {
+        if (row_element != "") {
+            const row = row_element.split(',');
+            // time.push(parseFloat(row[1])); // Not needed by the animation so is not included by default.
+            theta.push(parseFloat(row[2]));
+            phi.push(parseFloat(row[3]));
+            // theta_dot.push(parseFloat(row[4])); // Not needed by the animation so is not included by default.
+            // phi_dot.push(parseFloat(row[5])); // not needed by the animation sois not included by default.
+            timestep = parseFloat(row[6]);
+        }
+    });
+    isBusyImportingData = false;
+}
+
+// Import default data for animation.
+get_data("RK4_man_NoAirResist, time02,08,18 date12,11,2023.csv");
 
 
 // Some variables for user control of the animation.
@@ -31,6 +83,7 @@ startButton.addEventListener("click", function () {
     startButton.disabled = "disabled";
     pauseButton.disabled = "";
     stopButton.disabled = "";
+    change_angles();
     });
 
 pauseButton.addEventListener("click", function() {
@@ -155,9 +208,10 @@ tower.position.y = -200;
 pendelArm1.rotation.x = Math.PI;
 pendelArm1.position.y = 710;
 pendelArm1.position.x = 50;
-pendelArm2.rotation.x = Math.PI;
-pendelArm2.position.z = 430;
+pendelArm2.rotation.x = 0;
+pendelArm2.position.z = 200;
 pendelArm2.position.x = 30;
+pendelBall.position.z = 230;
 
 // Add the pendulum to the scene.
 scene.add(tower);
@@ -169,22 +223,31 @@ if (WebGL.isWebGLAvailable()) {
     alert("Error in loading WebGL, cannot proceed to animate the model.")
 }
 
+// Animate function for THREE.js WebGL animation implementation.
 function animate()
 {
-    requestAnimationFrame(animate);
+    
+    requestAnimationFrame(animate)
     controls.update();
     renderer.render(scene, camera);
 
     // TODO: Write code for animating with proper timesteps between each datapoint.
-    if (!isPaused && isStarted) {
-
+    
+    if (!isPaused && isStarted && !isBusyImportingData) {
+        pendelArm1.rotation.x = Math.PI + theta[counter];
+        pendelArm2.rotation.x = phi[counter];
+        counter += 1;
+        if (counter >= theta.length) {
+            counter = 0;
+        }
+        console.log("theta: " + theta[counter] + " phi: " + phi[counter]);
     }
 }
 
 function reset_model ()
 {
     pendelArm1.rotation.x = Math.PI;
-    pendelArm2.rotation.x = Math.PI;
+    pendelArm2.rotation.x = 0;
 }
 
 
