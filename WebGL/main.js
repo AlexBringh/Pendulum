@@ -83,7 +83,7 @@ startButton.addEventListener("click", function () {
     startButton.disabled = "disabled";
     pauseButton.disabled = "";
     stopButton.disabled = "";
-    change_angles();
+    dataDropdown.disabled = "disabled";
     });
 
 pauseButton.addEventListener("click", function() {
@@ -95,6 +95,7 @@ pauseButton.addEventListener("click", function() {
     startButton.disabled = "";
     pauseButton.disabled = "disabled";
     stopButton.disabled = "";
+    dataDropdown.disabled = "disabled";
 });
 
 stopButton.addEventListener("click", function() {
@@ -108,6 +109,7 @@ stopButton.addEventListener("click", function() {
     startButton.disabled = "";
     pauseButton.disabled = "disabled";
     stopButton.disabled = "disabled";
+    dataDropdown.disabled = "";
 });
 
 resetCamera.addEventListener("click", function () {
@@ -120,7 +122,15 @@ resetCamera.addEventListener("click", function () {
 
 // Setup event listener for dropdown selection of datapoints to animate.
 dataDropdown.addEventListener("change", function() {
-
+    switch (dataDropdown.value)
+    {
+        case "no_air_res_th0:0_ph0:0_td:0.01":
+            get_data("RK4_man_NoAirResist, time02,08,18 date12,11,2023.csv");
+            break;
+        case "air_res_th0:0_ph:0_td:0.01":
+            get_data("RK4_man_NoAirResist, time02,08,18 date12,11,2023.csv"); //TODO: This is temporary, change with actual datapoints later.
+            break;
+    }
 });
 
 
@@ -240,7 +250,6 @@ function animate()
         if (counter >= theta.length) {
             counter = 0;
         }
-        console.log("theta: " + theta[counter] + " phi: " + phi[counter]);
     }
 }
 
@@ -249,7 +258,6 @@ function reset_model ()
     pendelArm1.rotation.x = Math.PI;
     pendelArm2.rotation.x = 0;
 }
-
 
 
 // Present graph images corresponding to the animation
