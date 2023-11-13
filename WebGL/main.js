@@ -110,6 +110,7 @@ stopButton.addEventListener("click", function() {
     pauseButton.disabled = "disabled";
     stopButton.disabled = "disabled";
     dataDropdown.disabled = "";
+    counter = 0;
 });
 
 resetCamera.addEventListener("click", function () {
@@ -128,7 +129,7 @@ dataDropdown.addEventListener("change", function() {
             get_data("RK4_man_NoAirResist, time02,08,18 date12,11,2023.csv");
             break;
         case "air_res_th0:0_ph:0_td:0.01":
-            get_data("RK4_man_NoAirResist, time02,08,18 date12,11,2023.csv"); //TODO: This is temporary, change with actual datapoints later.
+            get_data("RK4_man_IncludeAirResist, time17,05,57 date13,11,2023.csv"); //TODO: This is temporary, change with actual datapoints later.
             break;
     }
 });
@@ -230,14 +231,14 @@ scene.add(tower);
 if (WebGL.isWebGLAvailable()) {
     animate();
 } else {
-    alert("Error in loading WebGL, cannot proceed to animate the model.")
+    alert("Error in loading WebGL, cannot proceed to animate the model.");
 }
 
 // Animate function for THREE.js WebGL animation implementation.
 function animate()
 {
     
-    requestAnimationFrame(animate)
+    requestAnimationFrame(animate);
     controls.update();
     renderer.render(scene, camera);
 

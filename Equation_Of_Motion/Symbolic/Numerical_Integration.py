@@ -8,9 +8,9 @@ import Equation_Of_Motion as eom
 import Graph_Results as graph
 
 
-def runge_kutta (time_end, time_start:float = 0, timestep:float = 0.1, theta_start:float = 0, theta_dot_start:float = 0.0, phi_start:float = 0, phi_dot_start:float = 0, decimal_roundoff: int = 10) -> pd.DataFrame:
+def runge_kutta (time_end, time_start:float = 0, timestep:float = 0.01, theta_start:float = 0, theta_dot_start:float = 0.0, phi_start:float = 0, phi_dot_start:float = 0, decimal_roundoff: int = 10) -> pd.DataFrame:
     """
-        Fourth order. explicit Runge-Kutta method for numerical integration.
+        Fourth order. Explicit Runge-Kutta method for numerical integration.
         Can specify starting points for:
         time_start, time_end, (time) 
         dt (timestep)
@@ -35,6 +35,7 @@ def runge_kutta (time_end, time_start:float = 0, timestep:float = 0.1, theta_sta
     store_phi_dot: list = []
     
     while eom.time < time_end:
+        print(eom.time)
         # Calculate k - corrector values from the function for the differential equation, 'solve_Q_dot'
         k1: np.array = eom.solve_Q_dot(time=eom.time, theta=eom.theta, theta_dot=eom.theta_dot, phi=eom.phi, phi_dot=eom.phi_dot)
         k2: np.array = eom.solve_Q_dot(time=eom.time + dt/2, theta=eom.theta, theta_dot=eom.theta_dot + dt * float(k1[0])/2, phi=eom.phi, phi_dot=eom.phi_dot + dt * float(k1[1]) / 2)
@@ -71,7 +72,7 @@ def runge_kutta (time_end, time_start:float = 0, timestep:float = 0.1, theta_sta
     results_list = pd.DataFrame(results_list)
 
     
-    save_results(results=results_list, title=(f"RK4_man_NoAirResist"))
+    save_results(results=results_list, title=(f"RK4_man_IncludeAirResist"))
 
     return results_list
 

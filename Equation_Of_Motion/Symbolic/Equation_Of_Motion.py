@@ -7,28 +7,45 @@ import numpy as np
 # Lengths on the pendulum
 # Unit: [m]
 l1 = 1
-l2 = 0.05
-l3 = 0.1
-l4 = 0.1
-l5 = 0.05
-l6 = 0.1
-l7 = 0.2
+l2 = 0.08
+l3 = 0.2
+l4 = 0.2
+l5 = 0.08
+l6 = 0.2
+l7 = 0.4
 
 # Radius of each body (since we assume the arms are cylinders and the end is a sphere)
 # Unit: [m]
-r1 = 0.03
-r2 = 0.03
-r3 = 0.1
+r1 = 0.1
+r2 = 0.1
+r3 = 0.2
+
+# Radius of joints (for friction)
+# Unit: [m]
+jr1 = 0.05
+jr2 = 0.05
 
 # Mass of each body
 # Unit [kg]
-m1 = 0.02
-m2 = 0.02
-m3 = 0.03
+m1 = 0.04
+m2 = 0.04
+m3 = 0.02
 
 # Gravitational acceleration
 # Unit: [m/s^2]
 g = 9.81
+
+# Drag coefficients
+c1 = 0.82
+c2 = 0.82
+c3 = 0.47
+
+# Air density
+# Unit [kg/m^3]
+air_density = 1.204
+
+# Friction coefficient
+fric = 0.25
 
 # Mass moments of inertia of each body, i about each axis, j. Jij
 # Formulas taken from wikipedia page about mass moments of inertia og common shapes.
@@ -66,25 +83,37 @@ M = np.array([
 
 # F-matrix
 # Unit forces: [N], Unit moments: [Nm]
-F = np.array([
-    [    0],
-    [    0],
-    [-m1*g],
-    [    0],
-    [    0],
-    [    0],
-    [    0],
-    [    0],
-    [-m2*g],
-    [    0],
-    [    0],
-    [    0],
-    [    0],
-    [    0],
-    [-m3*g],
-    [    0],
-    [    0],
-    [    0]])
+def F (theta, phi, theta_dot, phi_dot) -> np.array:
+
+    if not theta_dot == 0:
+        sign_theta = theta_dot / np.abs(theta_dot)
+    else:
+        sign_theta = 0
+
+    if not phi_dot == 0:
+        sign_phi = phi_dot / np.abs(phi_dot)
+    else:
+        sign_phi = 0
+
+    return np.array([
+        [    0],
+        [    0],
+        [-m1*g],
+        [-sign_theta * 2/3*(l3+l4) * (1/2 * c1 * air_density * ((l3+l4)*r1) * ((l3+l4)*theta_dot)**2) - sign_theta*(m2+m3)*g*fric*jr1], # M = (l3+l4) * F_air, F_air = (1/2 * c * air_density * A * v^2), v = theta_dot * (l3+l4)
+        [    0],
+        [    0],
+        [    0],
+        [    0],
+        [-m2*g],
+        [-sign_phi * 2/3*(l6 + l7 - r3) * (1/2 * c2 * air_density * (l7-r3+l6)*r2 * ((l6+l7-r3)*(phi_dot))**2) - sign_phi * (l6+l7-r3) * (1/2 * c3 * air_density * ((r3**2)*np.pi) * ((phi_dot)*((l6+l7 + r3)))**2) - sign_phi*(m2+m3)*g*fric*jr2], # M = (l3+l4) * F_air, F_air = (1/2 * c * air_density * A * v^2), v = phi_dot * (l6+l7-r3)
+        [    0],
+        [    0],
+        [    0],
+        [    0],
+        [-m3*g],
+        [    0],
+        [    0],
+        [    0]])
 
 
 """
@@ -197,11 +226,11 @@ def N_star (theta, theta_dot, phi, phi_dot) -> np.array:
     return np.add( np.dot( np.dot( B_T(theta, phi), M ), B_dot(theta, theta_dot, phi, phi_dot) ), np.dot( np.dot( np.dot( B_T(theta, phi), D(theta_dot, phi_dot) ), M ), B(theta, phi) ) )
 
 
-def F_star (theta, phi) -> np.array:
+def F_star (theta, phi, theta_dot, phi_dot) -> np.array:
     """
         F* = B_T * F
     """
-    return np.dot( B_T(theta, phi), F )
+    return np.dot( B_T(theta, phi), F(theta, phi, theta_dot, phi_dot) )
 
 
 def Q (theta_dot, phi_dot):
@@ -215,7 +244,7 @@ def solve_Q_dot (time, theta, theta_dot, phi, phi_dot) -> np.array:
         Equation of motion solving for Q_dot.
         Q_dot = inv(M*) * (F* - N* * Q)
     """
-    return np.subtract( np.dot( M_star_inv(theta, phi), F_star(theta, phi) ), np.dot( N_star(theta, theta_dot, phi, phi_dot), Q(theta_dot, phi_dot) ) )
+    return np.subtract( np.dot( M_star_inv(theta, phi), F_star(theta, phi, theta_dot, phi_dot) ), np.dot( N_star(theta, theta_dot, phi, phi_dot), Q(theta_dot, phi_dot) ) )
 
 
 def integrate_Q_dot (data) -> np.array:
