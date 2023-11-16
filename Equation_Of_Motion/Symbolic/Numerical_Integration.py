@@ -34,8 +34,10 @@ def runge_kutta (time_end, time_start:float = 0, timestep:float = 0.01, theta_st
     store_theta_dot: list = []
     store_phi_dot: list = []
     
+    print(f"Running Runge-Kutta 4th order for: time-target:{time_end}, timestep:{dt}, decimal_roundoff:{dro}, theta0:{theta_start}, phi0:{phi_start}, theta_dot0:{theta_dot_start}, phi_dot0:{phi_dot_start}")
+
     while eom.time < time_end:
-        print(eom.time)
+        print(f"\rTime: {eom.time}")
         # Calculate k - corrector values from the function for the differential equation, 'solve_Q_dot'
         k1: np.array = eom.solve_Q_dot(time=eom.time, theta=eom.theta, theta_dot=eom.theta_dot, phi=eom.phi, phi_dot=eom.phi_dot)
         k2: np.array = eom.solve_Q_dot(time=eom.time + dt/2, theta=eom.theta, theta_dot=eom.theta_dot + dt * float(k1[0])/2, phi=eom.phi, phi_dot=eom.phi_dot + dt * float(k1[1]) / 2)
