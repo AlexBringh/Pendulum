@@ -58,7 +58,7 @@ async function get_data(filename)
 }
 
 // Import default data for animation.
-get_data("RK4_man_NoAirResist, time02,08,18 date12,11,2023.csv");
+get_data("RK4_man_NoAirResistance, time20,44,23 date16,11,2023.csv");
 
 
 // Some variables for user control of the animation.
@@ -125,11 +125,14 @@ resetCamera.addEventListener("click", function () {
 dataDropdown.addEventListener("change", function() {
     switch (dataDropdown.value)
     {
-        case "no_air_res_th0:0_ph0:0_td:0.01":
-            get_data("RK4_man_NoAirResist, time02,08,18 date12,11,2023.csv");
+        case "rk4_basic_th0:0_ph0:0_td:0.01":
+            get_data("RK4_man_NoAirResistance, time20,44,23 date16,11,2023.csv");
             break;
-        case "air_res_th0:0_ph:0_td:0.01":
-            get_data("RK4_man_IncludeAirResist, time17,05,57 date13,11,2023.csv"); //TODO: This is temporary, change with actual datapoints later.
+        case "rk4_simple_air_res_th0:0_ph:0_td:0.01":
+            get_data("RK4_man_SimpleAirResistance, time01,43,43 date18,11,2023.csv"); 
+            break;
+        case "rk4_complex_air_res_th0:0_ph:0_td:0.01":
+            get_data("");
             break;
     }
 });
