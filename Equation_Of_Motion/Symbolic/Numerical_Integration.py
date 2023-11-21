@@ -355,24 +355,24 @@ def save_results (results:pd.DataFrame, title:str):
 #linear_multistep(time_end=100, timestep=0.01, title="Timestep_0,01")
 
 # Test for 100s time with timestep 0.0001s
-linear_multistep(time_end=100, timestep=0.001, title="Timestep_0,001")
+#linear_multistep(time_end=100, timestep=0.001, title="Timestep_0,001")
 
 # Test for timestep 0.1. Drops the arms from pointing 30 degrees upwards (theta = 1/6 * pi).
-linear_multistep(time_end=20, timestep=0.1, theta_start=1/6*np.pi, title="Drop30deg_timestep_0,1")
+#linear_multistep(time_end=20, timestep=0.1, theta_start=1/6*np.pi, title="Drop30deg_timestep_0,1")
 
 # Test for timestep 0.01. Drops the arms from pointing 30 degrees upwards (theta = 1/6 * pi).
-linear_multistep(time_end=20, timestep=0.01, theta_start=1/6*np.pi, title="Drop30deg_timestep_0,01")
+#linear_multistep(time_end=20, timestep=0.01, theta_start=1/6*np.pi, title="Drop30deg_timestep_0,01")
 
 # Test for timestep 0.001. Drops the arms from pointing 30 degrees upwards (theta = 1/6 * pi).
-linear_multistep(time_end=20, timestep=0.001, theta_start=1/6*np.pi, title="Drop30deg_timestep_0,001")
+#linear_multistep(time_end=20, timestep=0.001, theta_start=1/6*np.pi, title="Drop30deg_timestep_0,001")
 
 # Test for timestep 0.1. Simple air resistance.
-linear_multistep(time_end=100, timestep=0.1, title="SimpleAirResistance_timestep_0,1", air_resistance_type=1)
+#linear_multistep(time_end=100, timestep=0.1, title="SimpleAirResistance_timestep_0,1", air_resistance_type=1)
 
 # Test for timestep 0.01. Simple air resistance.
-linear_multistep(time_end=100, timestep=0.01, title="SimpleAirResistance_timestep_0,01", air_resistance_type=1)
+#linear_multistep(time_end=100, timestep=0.01, title="SimpleAirResistance_timestep_0,01", air_resistance_type=1)
 
 # Test for timestep 0.001. Simple air resistance.
-linear_multistep(time_end=100, timestep=0.001, title="SimpleAirResistance_timestep_0,001", air_resistance_type=1)
+#linear_multistep(time_end=100, timestep=0.001, title="SimpleAirResistance_timestep_0,001", air_resistance_type=1)
 
 print("\nNumerical integration has finished.")
