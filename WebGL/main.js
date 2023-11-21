@@ -58,7 +58,7 @@ async function get_data(filename)
 }
 
 // Import default data for animation.
-get_data("RK4_man_NoAirResistance, time20,44,23 date16,11,2023.csv");
+get_data("RK4_NoAirResistance, time21,00,17 date20,11,2023.csv");
 
 
 // Some variables for user control of the animation.
@@ -126,13 +126,19 @@ dataDropdown.addEventListener("change", function() {
     switch (dataDropdown.value)
     {
         case "rk4_basic_th0:0_ph0:0_td:0.01":
-            get_data("RK4_man_NoAirResistance, time20,44,23 date16,11,2023.csv");
+            get_data("RK4_NoAirResistance, time21,00,17 date20,11,2023.csv");
             break;
         case "rk4_simple_air_res_th0:0_ph:0_td:0.01":
-            get_data("RK4_man_SimpleAirResistance, time01,43,43 date18,11,2023.csv"); 
+            get_data("RK4_SimpleAirResistance, time21,00,30 date20,11,2023.csv"); 
             break;
         case "rk4_complex_air_res_th0:0_ph:0_td:0.01":
-            get_data("");
+            get_data("RK4_ComplexAirResistance, time21,00,44 date20,11,2023.csv");
+            break;
+        case "rk4_drop_from_30_th0:pi/6_ph:0_td:0.1":
+            get_data("RK4_DropFrom30DegreesUp, time21,09,05 date20,11,2023.csv");
+            break;
+        case "rk4_initial_velocity_th0:pi/6_ph:0_td:0.1":
+            get_data("RK4_InitialVelocity, time21,02,10 date20,11,2023.csv");
             break;
     }
 });

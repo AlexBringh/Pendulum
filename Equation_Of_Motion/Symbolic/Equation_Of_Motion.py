@@ -8,17 +8,17 @@ import numpy as np
 # Unit: [m]
 l1 = 1
 l2 = 0.08
-l3 = 0.2
-l4 = 0.2
+l3 = 0.1
+l4 = 0.1
 l5 = 0.08
-l6 = 0.2
-l7 = 0.4
+l6 = 0.1
+l7 = 0.2
 
 # Radius of each body (since we assume the arms are cylinders and the end is a sphere)
 # Unit: [m]
-r1 = 0.1
-r2 = 0.1
-r3 = 0.2
+r1 = 0.03
+r2 = 0.03
+r3 = 0.05
 
 # Radius of joints (for friction)
 # Unit: [m]
@@ -27,9 +27,9 @@ jr2 = 0.05
 
 # Mass of each body
 # Unit [kg]
-m1 = 0.04
-m2 = 0.04
-m3 = 0.02
+m1 = 0.1
+m2 = 0.1
+m3 = 0.2
 
 # Gravitational acceleration
 # Unit: [m/s^2]
@@ -45,7 +45,7 @@ c3 = 0.47
 air_density = 1.204
 
 # Friction coefficient
-fric = 0.25
+fric = 0.005
 
 # Variable values for whether to include air resistance and friction, and what kind to include.
 air_resistance_type: int = 0 # 0 = no air resistance. 1 = simple, "closest-body" air resistance. 2 = complex, "all bodies effect" air resistance.
@@ -96,12 +96,12 @@ def air_resistance_torque (theta, phi, theta_dot, phi_dot) -> list[float]:
 
     # Determine which direction the force should act depending on what direction the angular velocities have.
     if not theta_dot == 0:
-        dir_theta = theta_dot / np.abs(theta_dot)
+        dir_theta = (-1) * theta_dot / np.abs(theta_dot)
     else:
         dir_theta = 0
 
     if not phi_dot == 0:
-        dir_phi = phi_dot / np.abs(phi_dot)
+        dir_phi = (-1) * phi_dot / np.abs(phi_dot)
     else:
         dir_phi = 0
 
@@ -109,13 +109,14 @@ def air_resistance_torque (theta, phi, theta_dot, phi_dot) -> list[float]:
     if air_resistance_type == 1:
         # Use simple air resistance where each variable angle, theta and phi, gets affected by only the body's, in which they belong to, drag force from the respective angular velocity.
         air_res_theta_dot = dir_theta * (2/3 * (1/2 * air_density * c1 * (theta_dot * (l3 + l4))**2) * (l3+l4))
-        air_res_phi_dot   = dir_phi * 2/3 * (1/2 * air_density * c2 * (phi_dot   * (l6 + l7 - r3))**2) * (l6+l7-r3) + dir_phi * (1/2 * air_density * c3 * (phi_dot * (l6+l7))**2) * (l6+l7)
+        air_res_phi_dot   = dir_phi * (2/3 * (1/2 * air_density * c2 * (phi_dot   * (l6 + l7 - r3))**2) * (l6+l7-r3)) + dir_phi * (1/2 * air_density * c3 * (phi_dot * (l6+l7))**2) * (l6+l7)
 
     elif air_resistance_type == 2:
         # Use complex air resistance where each variable angle, theta and phi gets affected by the drag force of each body "further out" on the model 
         # and affected by each angular velocity "further in" on the model as well.
-        air_res_theta_dot = dir_theta * (2/3 * (1/2 * air_density * c1 * (theta_dot * (l3 + l4))**2) * (l3+l4))
-        air_res_phi_dot   = dir_phi * 2/3 * (1/2 * air_density * c2 * (phi_dot   * (l6 + l7 - r3))**2) * (l6+l7-r3) + dir_phi * (1/2 * air_density * c3 * (phi_dot * (l6+l7))**2) * (l6+l7)
+        air_res_theta_dot = dir_theta * ( 2/3 * (l3 + l4 + (l6 + l7)*np.cos(phi)) * (1/2 * c1 * air_density * (l3 + l4 + (l6 + l7 - r3) * np.cos(phi))) )
+        air_res_phi_dot = dir_phi * ((2/3 * (1/2 * air_density * c2 * (phi_dot * (l6 + l7 - r3) + theta_dot * (l3 + l4 + (l6 + l7 - r3)*np.cos(phi)))**2) * (l6+l7-r3)) + (1/2 * air_density * c3 * (phi_dot * (l6+l7) + theta_dot * (l3 + l4 + (l6 + l7)*np.cos(phi)))**2) * (l6+l7))
+    
     else:
         # Default (air_resistance_type = 0). Does not use air resistance in integration.
         air_res_theta_dot = 0
@@ -130,12 +131,12 @@ def friction_torque (theta_dot, phi_dot) -> list[float]:
 
     # Determine which direction the force should act depending on what direction the angular velocities have.
     if not theta_dot == 0:
-        dir_theta = theta_dot / np.abs(theta_dot)
+        dir_theta = (-1) * theta_dot / np.abs(theta_dot)
     else:
         dir_theta = 0
 
     if not phi_dot == 0:
-        dir_phi = phi_dot / np.abs(phi_dot)
+        dir_phi = (-1) * phi_dot / np.abs(phi_dot)
     else:
         dir_phi = 0
 
@@ -157,13 +158,13 @@ def F (theta, phi, theta_dot, phi_dot) -> np.array:
         [    0],
         [    0],
         [-m1*g],
-        [-air_resistance_torque(theta, phi, theta_dot, phi_dot)[0] - friction_torque(theta_dot, phi_dot)[0]], # M = (l3+l4) * F_air, F_air = (1/2 * c * air_density * A * v^2), v = theta_dot * (l3+l4)
+        [air_resistance_torque(theta, phi, theta_dot, phi_dot)[0] + friction_torque(theta_dot, phi_dot)[0]], # M = (l3+l4) * F_air, F_air = (1/2 * c * air_density * A * v^2), v = theta_dot * (l3+l4)
         [    0],
         [    0],
         [    0],
         [    0],
         [-m2*g],
-        [-air_resistance_torque(theta, phi, theta_dot, phi_dot)[1] - friction_torque(theta_dot, phi_dot)[1]], # M = (l3+l4) * F_air, F_air = (1/2 * c * air_density * A * v^2), v = phi_dot * (l6+l7-r3)
+        [air_resistance_torque(theta, phi, theta_dot, phi_dot)[1] + friction_torque(theta_dot, phi_dot)[1]], # M = (l3+l4) * F_air, F_air = (1/2 * c * air_density * A * v^2), v = phi_dot * (l6+l7-r3)
         [    0],
         [    0],
         [    0],
@@ -305,6 +306,8 @@ def solve_Q_dot (time, theta, theta_dot, phi, phi_dot) -> np.array:
     return np.subtract( np.dot( M_star_inv(theta, phi), F_star(theta, phi, theta_dot, phi_dot) ), np.dot( N_star(theta, theta_dot, phi, phi_dot), Q(theta_dot, phi_dot) ) )
 
 
-def integrate_Q_dot (data) -> np.array:
+def integrate_Q_dot (time, data) -> np.array:
+    
+
     return solve_Q_dot(theta=data[0], theta_dot=data[1], phi=data[2], phi_dot=[3])
 
