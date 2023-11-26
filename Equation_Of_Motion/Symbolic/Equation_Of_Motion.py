@@ -38,11 +38,11 @@ g = 9.81
 # Drag coefficients
 c1 = 0.82
 c2 = 0.82
-c3 = 0.47
+c3 = 0.5
 
 # Air density
 # Unit [kg/m^3]
-air_density = 1.204
+air_density = 1.293
 
 # Friction coefficient
 fric = 0.005
