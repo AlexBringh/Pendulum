@@ -169,6 +169,97 @@ def euler_explicit (time_end, time_start:float = 0, timestep:float = 0.01, theta
     return results_list
 
 
+def euler_implicit (time_end, time_start:float = 0, timestep:float = 0.01, theta_start:float = 0, theta_dot_start:float = 0.0, phi_start:float = 0, phi_dot_start:float = 0, air_resistance_type: int = 0, friction_type: int = 0, decimal_roundoff: int = 10, title: str = "") -> pd.DataFrame:
+    """
+        Implicit Euler method for numerical integration.
+        Can specify starting points for:
+        time_start, time_end, (time) 
+        dt (timestep)
+        theta, phi (angles)
+        theta_dot, phi_dot (angular velocity)
+        theta_dot_dot, phi_dot_dot (angular acceleration)
+    """
+    dt: float = timestep # timestep
+    dro: int = decimal_roundoff # decimal round off to minimize the mess of small floating points
+    # Set starting-points.
+    eom.time = time_start
+    eom.theta = theta_start
+    eom.phi = phi_start
+    eom.theta_dot = theta_dot_start
+    eom.phi_dot = phi_dot_start
+    eom.air_resistance_type = air_resistance_type # Set setting for air resistance or not.
+    eom.friction_type = friction_type # Set setting for friction or not.
+
+    # Define lists for storing time, theta, phi, theta_dot, phi_dot, theta_dot_dot and phi_dot_dot
+    store_time: list = []
+    store_theta: list = []
+    store_phi: list = []
+    store_theta_dot: list = []
+    store_phi_dot: list = []
+
+    # Store initial values to the results.
+    store_time.append(eom.time)
+    store_theta.append(eom.theta)
+    store_phi.append(eom.phi)
+    store_theta_dot.append(eom.theta_dot)
+    store_phi_dot.append(eom.phi_dot)
+
+    # Temporary velocity terms.
+    theta_dot_temp: float
+    phi_dot_temp: float
+
+    print(f"\nRunning Implicit-Euler for: {title}, time-target:{time_end}, timestep:{dt}, decimal_roundoff:{dro}, theta0:{theta_start}, phi0:{phi_start}, theta_dot0:{theta_dot_start}, phi_dot0:{phi_dot_start}")
+
+    while eom.time < time_end:
+        print(f"\rTime: {eom.time}, theta: {round(eom.theta, dro)}, phi: {round(eom.phi, dro)}", end="")
+        
+        Q_new = dt * eom.solve_Q_dot(time=eom.time, theta=eom.theta, phi=eom.phi, theta_dot=eom.theta_dot, phi_dot=eom.phi_dot)
+
+        theta_dot_temp = float(Q_new[0]) + eom.theta_dot
+        phi_dot_temp = float(Q_new[1]) + eom.phi_dot
+
+        Q_new = dt * eom.solve_Q_dot(time=eom.time+dt, theta=eom.theta, phi=eom.phi, theta_dot=theta_dot_temp, phi_dot=phi_dot_temp)
+
+        eom.theta_dot = float(Q_new[0]) + eom.theta_dot
+        eom.phi_dot = float(Q_new[1]) + eom.phi_dot
+
+        eom.theta = eom.theta + eom.theta_dot * dt
+        eom.phi = eom.phi + eom.phi_dot * dt
+
+        eom.time = eom.time + dt
+
+        eom.time = round(eom.time, dro)
+        eom.theta = round(eom.theta, dro)
+        eom.phi = round(eom.phi, dro)
+        eom.theta_dot = round(eom.theta_dot, dro)
+        eom.phi_dot = round(eom.phi_dot, dro)
+    
+        store_time.append(eom.time)
+        store_theta.append(eom.theta)
+        store_phi.append(eom.phi)
+        store_theta_dot.append(eom.theta_dot)
+        store_phi_dot.append(eom.phi_dot)
+
+    print("")
+
+    print("")
+
+    # Define return list
+    results_list: dict = {
+        "time": store_time,
+        "theta": store_theta,
+        "phi": store_phi,
+        "theta_dot": store_theta_dot,
+        "phi_dot": store_phi_dot,
+        "timestep": dt
+    }
+    results_list = pd.DataFrame(results_list)
+
+    save_results(results=results_list, title=(f"EulerImp_{title}"))
+
+    return results_list
+        
+
 def linear_multistep (time_end, time_start:float = 0, timestep:float = 0.01, theta_start:float = 0, theta_dot_start:float = 0.0, phi_start:float = 0, phi_dot_start:float = 0, air_resistance_type: int = 0, friction_type: int = 0, decimal_roundoff: int = 10, title: str = "") -> pd.DataFrame:
     """
         Explicit LInear-Multistep (Adam-Bashforth) method for numerical integration.
@@ -293,86 +384,52 @@ def save_results (results:pd.DataFrame, title:str):
     
 
 """
-    Run Runge-Kutta integrations
+    Steg 0
+    Drøft modellfeil REINT TEORETISK Å SKRIVA
+
+    Steg 1
+    Test for Runge-Kutta mot andre metodar. TEST NUMERISKE METODAR på 30 grader drop test
+
+    Steg 2 Runge-Kutta med ulike initialverdiar. Kanskje også Euler Implicit? NUMERISKE FEIL
+
+    Steg 3 Test med luftmotstand modellane
+    
+    EKSTRA TEST GRENSANE FOR MODELLEN
+
+    SKRIVA DRØFTING, OPPDATERA OG PUBLISERA GITHUB KODEN MED WEBGL NETTSIDA
+    
 """
-# Test for 100s time, for dt = 0.1
-#big_timestep = runge_kutta(time_end=100, timestep=0.1, title="BigTimeStep")
 
-# Test for 100s time, for a moderately small timestep. No air resistance (default).
-#no_air_resistance = runge_kutta(time_end=100, timestep=0.01, title="NoAirResistance")
-
-# Test for the same as above, but include the simple air resistance model now.
-#simple_air_resistance = runge_kutta(time_end=100, timestep=0.01, air_resistance_type=1, title="SimpleAirResistance")
-
-# Test again for the same as above, but this time include the complex air resistance model.
-#complex_air_resistance = runge_kutta(time_end=100, timestep=0.01, air_resistance_type=2, title="ComplexAirResistance")
-
-# Drops the arms from pointing 30 degrees upwards (theta = 1/6 * pi).
-#drop_30_degree_up = runge_kutta(time_end=20, timestep=0.01, theta_start=1/6*np.pi, title="DropFrom30DegreesUp")
-
-# Gives the arms an initial velocity
-#initial_velocity = runge_kutta(time_end=1000, timestep=0.01, title="InitialVelocity", theta_dot_start=-0.5, phi_dot_start=-1.5)
-
-
+# Steg 1
 """
-    Run Explicit Euler integrations
+runge_kutta(time_end = 100, timestep=0.01, theta_start=-np.pi/180 * 60, title="dt0,01_NoAirRes")
+euler_explicit(time_end = 100, timestep=0.01, theta_start=-np.pi/180 * 60, title="dt0,01_NoAirRes")
+euler_implicit(time_end = 100, timestep=0.01, theta_start=-np.pi/180 * 60, title="dt0,01_NoAirRes")
+linear_multistep(time_end = 100, timestep=0.01, theta_start=-np.pi/180 * 60, title="dt0,01_NoAirRes")
 """
-# Test for 100s time with timestep 0.01s, same as what we use on most Runge-Kutta integrations for comparison. No air resistance.
-#euler_explicit(time_end=100, timestep=0.1, title="Timestep_0,1")
 
-# Test for 100s time with timestep 0.01s
-#euler_explicit(time_end=100, timestep=0.01, title="Timestep_0,01")
-
-# Test for 100s time with timestep 0.0001s
-#euler_explicit(time_end=100, timestep=0.001, title="Timestep_0,001")
-
-# Test for timestep 0.1. Drops the arms from pointing 30 degrees upwards (theta = 1/6 * pi).
-#euler_explicit(time_end=20, timestep=0.1, theta_start=1/6*np.pi, title="Drop30deg_timestep_0,1")
-
-# Test for timestep 0.01. Drops the arms from pointing 30 degrees upwards (theta = 1/6 * pi).
-#euler_explicit(time_end=20, timestep=0.01, theta_start=1/6*np.pi, title="Drop30deg_timestep_0,01")
-
-# Test for timestep 0.001. Drops the arms from pointing 30 degrees upwards (theta = 1/6 * pi).
-#euler_explicit(time_end=20, timestep=0.001, theta_start=1/6*np.pi, title="Drop30deg_timestep_0,001")
-
-# Test for timestep 0.1. Simple air resistance.
-#euler_explicit(time_end=100, timestep=0.1, title="SimpleAirResistance_timestep_0,1", air_resistance_type=1)
-
-# Test for timestep 0.01. Simple air resistance.
-#euler_explicit(time_end=100, timestep=0.01, title="SimpleAirResistance_timestep_0,01", air_resistance_type=1)
-
-# Test for timestep 0.001. Simple air resistance.
-#euler_explicit(time_end=100, timestep=0.001, title="SimpleAirResistance_timestep_0,001", air_resistance_type=1)
-
-
+# Steg 2
 """
-    Run Linear Multi-step (Adam Bashforth) method integrations
+runge_kutta(time_end = 100, timestep=0.01, theta_start=-np.pi/180 * 60, title="dt0,01_NoAirRes")
+runge_kutta(time_end = 100, timestep=0.01, theta_start=-np.pi/180 * 40, title="dt0,01_NoAirRes")
+runge_kutta(time_end = 100, timestep=0.01, theta_start=-np.pi/180 * 20, title="dt0,01_NoAirRes")
+runge_kutta(time_end = 100, timestep=0.01, theta_start=-np.pi/180 * 0, title="dt0,01_NoAirRes")
+
+euler_implicit(time_end = 100, timestep=0.01, theta_start=-np.pi/180 * 60, title="dt0,01_NoAirRes")
+euler_implicit(time_end = 100, timestep=0.01, theta_start=-np.pi/180 * 40, title="dt0,01_NoAirRes")
+euler_implicit(time_end = 100, timestep=0.01, theta_start=-np.pi/180 * 20, title="dt0,01_NoAirRes")
+euler_implicit(time_end = 100, timestep=0.01, theta_start=-np.pi/180 * 0, title="dt0,01_NoAirRes")
 """
-# Test for 100s time with timestep 0.01s, same as what we use on most Runge-Kutta integrations for comparison. No air resistance.
-#linear_multistep(time_end=100, timestep=0.1, title="Timestep_0,1")
 
-# Test for 100s time with timestep 0.01s
-#linear_multistep(time_end=100, timestep=0.01, title="Timestep_0,01")
+# Steg 3
 
-# Test for 100s time with timestep 0.0001s
-#linear_multistep(time_end=100, timestep=0.001, title="Timestep_0,001")
+euler_implicit(time_end = 100, timestep=0.01, theta_start=-np.pi/180 * 40, title="50 grader drop NoAirRes", air_resistance_type=0)
+euler_implicit(time_end = 100, timestep=0.001, theta_start=-np.pi/180 * 60, title="30 grader drop NoAirRes", air_resistance_type=0)
+"""
+euler_implicit(time_end = 100, timestep=0.01, theta_start=-np.pi/180 * 40, title="50 grader drop SimpleAirRes", air_resistance_type=1)
+euler_implicit(time_end = 100, timestep=0.001, theta_start=-np.pi/180 * 60, title="30 grader drop SimpleAirRes", air_resistance_type=1)
 
-# Test for timestep 0.1. Drops the arms from pointing 30 degrees upwards (theta = 1/6 * pi).
-#linear_multistep(time_end=20, timestep=0.1, theta_start=1/6*np.pi, title="Drop30deg_timestep_0,1")
-
-# Test for timestep 0.01. Drops the arms from pointing 30 degrees upwards (theta = 1/6 * pi).
-#linear_multistep(time_end=20, timestep=0.01, theta_start=1/6*np.pi, title="Drop30deg_timestep_0,01")
-
-# Test for timestep 0.001. Drops the arms from pointing 30 degrees upwards (theta = 1/6 * pi).
-#linear_multistep(time_end=20, timestep=0.001, theta_start=1/6*np.pi, title="Drop30deg_timestep_0,001")
-
-# Test for timestep 0.1. Simple air resistance.
-#linear_multistep(time_end=100, timestep=0.1, title="SimpleAirResistance_timestep_0,1", air_resistance_type=1)
-
-# Test for timestep 0.01. Simple air resistance.
-#linear_multistep(time_end=100, timestep=0.01, title="SimpleAirResistance_timestep_0,01", air_resistance_type=1)
-
-# Test for timestep 0.001. Simple air resistance.
-#linear_multistep(time_end=100, timestep=0.001, title="SimpleAirResistance_timestep_0,001", air_resistance_type=1)
-
+euler_implicit(time_end = 100, timestep=0.01, theta_start=-np.pi/180 * 40, title="50 grader drop ComplexAirRes", air_resistance_type=2)
+euler_implicit(time_end = 100, timestep=0.001, theta_start=-np.pi/180 * 20, title="30 grader drop ComplexAirRes", air_resistance_type=2)
+"""
 print("\nNumerical integration has finished.")
