@@ -143,6 +143,12 @@ dataDropdown.addEventListener("change", function() {
         case "option6":
             get_data("EulerImp_50 grader drop ComplexAirRes, time22,32,14 date26,11,2023.csv");
             break;
+        case "option7":
+            get_data("70grader_drop EulerImp_dt0,01_NoAirRes, time21,38,10 date26,11,2023.csv");
+            break;
+        case "option8":
+            get_data("70grader_drop RK4_dt0,01_NoAirRes, time21,37,30 date26,11,2023.csv");
+            break;
     }
 });
 
