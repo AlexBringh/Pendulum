@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pendulum animation</title>
+    
+    
+  <script type="module" crossorigin src="./assets/index-c5e8c608.js"></script>
+  <link rel="stylesheet" href="./assets/index-a77e308f.css">
+</head>
+<body>
+    <section id="datapoints_selection_panel">
+        Select datapoints to animate.
+        <select name="datapoints" id="datapoints_dropdown">
+            <option value="option1">Euler implicit, no air resistance, 30 degree height.</option>
+            <option value="option2">Euler implicit, no air resistance, 50 degree height.</option>
+            <option value="option3">Euler implicit, simple air resistance, 30 degree height.</option>
+            <option value="option4">Euler implicit, simple air resistance, 50 degree height.</option>
+            <option value="option5">Euler implicit, complex air resistance, 30 degree height.</option>
+            <option value="option6">Euler implicit, complex air resistance, 50 degree height.</option>
+        </select>
+    </section>
+    <section id="control_panel">
+        <input type="button" value="Start" id="start_animation_btn">
+        <input type="button" value="Pause" id="pause_animation_btn" disabled="disabled">
+        <input type="button" value="Stop" id="stop_animation_btn" disabled="disabled">
+        <input type="button" value="Reset Camera" id="reset_camera_btn">
+    </section>
+    <section id="animation_container"></section>
+    <section id="graphs"></section>
+</body>
+</html>
