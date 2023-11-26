@@ -58,7 +58,7 @@ async function get_data(filename)
 }
 
 // Import default data for animation.
-get_data("RK4_NoAirResistance, time21,00,17 date20,11,2023.csv");
+get_data("EulerImp_30 grader drop NoAirRes, time22,41,50 date26,11,2023.csv");
 
 
 // Some variables for user control of the animation.
@@ -125,20 +125,23 @@ resetCamera.addEventListener("click", function () {
 dataDropdown.addEventListener("change", function() {
     switch (dataDropdown.value)
     {
-        case "rk4_basic_th0:0_ph0:0_td:0.01":
-            get_data("RK4_NoAirResistance, time21,00,17 date20,11,2023.csv");
+        case "option1":
+            get_data("EulerImp_30 grader drop NoAirRes, time22,41,50 date26,11,2023.csv");
             break;
-        case "rk4_simple_air_res_th0:0_ph:0_td:0.01":
-            get_data("RK4_SimpleAirResistance, time21,00,30 date20,11,2023.csv"); 
+        case "option2":
+            get_data("EulerImp_50 grader drop NoAirRes, time22,41,08 date26,11,2023.csv"); 
             break;
-        case "rk4_complex_air_res_th0:0_ph:0_td:0.01":
-            get_data("RK4_ComplexAirResistance, time21,00,44 date20,11,2023.csv");
+        case "option3":
+            get_data("EulerImp_30 grader drop SimpleAirRes, time22,32,04 date26,11,2023.csv");
             break;
-        case "rk4_drop_from_30_th0:pi/6_ph:0_td:0.1":
-            get_data("RK4_DropFrom30DegreesUp, time21,09,05 date20,11,2023.csv");
+        case "option4":
+            get_data("EulerImp_50 grader drop SimpleAirRes, time22,31,20 date26,11,2023.csv");
             break;
-        case "rk4_initial_velocity_th0:pi/6_ph:0_td:0.1":
-            get_data("RK4_InitialVelocity, time21,02,10 date20,11,2023.csv");
+        case "option5":
+            get_data("EulerImp_30 grader drop ComplexAirRes, time22,33,00 date26,11,2023.csv");
+            break;
+        case "option6":
+            get_data("EulerImp_50 grader drop ComplexAirRes, time22,32,14 date26,11,2023.csv");
             break;
     }
 });

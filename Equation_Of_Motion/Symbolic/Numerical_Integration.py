@@ -422,10 +422,10 @@ euler_implicit(time_end = 100, timestep=0.01, theta_start=-np.pi/180 * 0, title=
 """
 
 # Steg 3
-
+"""
 euler_implicit(time_end = 100, timestep=0.01, theta_start=-np.pi/180 * 40, title="50 grader drop NoAirRes", air_resistance_type=0)
 euler_implicit(time_end = 100, timestep=0.001, theta_start=-np.pi/180 * 60, title="30 grader drop NoAirRes", air_resistance_type=0)
-"""
+
 euler_implicit(time_end = 100, timestep=0.01, theta_start=-np.pi/180 * 40, title="50 grader drop SimpleAirRes", air_resistance_type=1)
 euler_implicit(time_end = 100, timestep=0.001, theta_start=-np.pi/180 * 60, title="30 grader drop SimpleAirRes", air_resistance_type=1)
 
